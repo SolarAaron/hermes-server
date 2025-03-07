@@ -1,0 +1,67 @@
+syntax = "proto3";
+package slr.hermes;
+
+import "src/protobuf/messages.proto";
+
+message operation_result {
+  bool success = 1;
+  optional bytes result = 2;
+}
+
+message user_data_request {
+  bytes target_user_id = 1;
+}
+
+message authenticated_request {
+  bytes user_id = 1;
+  uint64 key_index = 2;
+  bytes nonce = 3;
+  bytes signature = 4;
+}
+
+message header_request {
+  authenticated_request user_auth = 1;
+  uint64 timestamp = 2;
+}
+
+message full_message_request {
+  authenticated_request user_auth = 1;
+  bytes header_id = 2;
+}
+
+message add_key_request {
+  authenticated_request user_auth = 1;
+  bytes new_key = 2;
+}
+
+message add_media_request {
+  authenticated_request user_auth = 1;
+  chat_attachment media = 2;
+}
+
+message edit_message_request {
+  authenticated_request user_auth = 1;
+  chat_header new_header = 2;
+  uint64 timestamp = 3;
+}
+
+message delete_user_media_request {
+  authenticated_request user_auth = 1;
+  uint64 media_index = 2;
+}
+
+service prometheus_service {
+  rpc register_user(chat_user) returns (operation_result);
+  rpc send_messages(stream chat_header) returns (stream operation_result);
+
+  rpc get_user_data(user_data_request) returns (operation_result);
+  rpc get_headers_after(header_request) returns (stream operation_result);
+  rpc get_full_message(full_message_request) returns (operation_result);
+
+  rpc add_user_key(add_key_request) returns (operation_result);
+  rpc add_user_media(add_media_request) returns (operation_result);
+
+  rpc edit_message(edit_message_request) returns (operation_result);
+
+  rpc delete_user_media(delete_user_media_request) returns (operation_result);
+}

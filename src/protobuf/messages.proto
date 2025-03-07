@@ -1,0 +1,82 @@
+syntax = "proto3";
+package slr.hermes;
+
+message chat_user {
+  optional bytes user_id = 1;
+  repeated bytes public_keys = 2;
+  optional string nickname = 3;
+  optional string status = 4;
+  optional string phone = 5;
+  optional string mail = 6;
+  optional uint64 pic_idx = 7;
+  repeated chat_attachment picture = 8;
+}
+
+enum chat_status {
+  sending = 0;
+  sent = 1;
+  delivered = 2;
+  seen = 3;
+}
+
+enum recipient_type {
+  user = 0;
+  group = 1;
+}
+
+message chat_header {
+  bytes sender_id = 1;
+  bytes recipient_id = 2;
+  recipient_type recipient_type = 3;
+  optional bytes message_id = 4;
+  uint64 timestamp = 5;
+  chat_status status = 6;
+  optional uint64 edit_timestamp = 7;
+  uint64 key_index = 8;
+  uint64 block_size = 9;
+  string strength = 10;
+  bytes message_key = 11;
+  bytes key_signature = 12;
+  optional uint64 message_length = 13;
+  repeated bytes message_bytes = 14;
+  optional uint64 preview_length = 15;
+  repeated bytes preview_bytes = 16;
+}
+
+message chat_content_map {
+  map<string, chat_content> content = 1;
+}
+
+message chat_content {
+  oneof content {
+    chat_text text = 1;
+    chat_attachment attachment = 2;
+    chat_location location = 3;
+    chat_quote quote = 4;
+    chat_deleted deleted = 5;
+  }
+}
+
+message chat_text {
+  string text = 1;
+}
+
+message chat_attachment {
+  string file_name = 1;
+  uint64 file_size = 2;
+  repeated bytes blocks = 3;
+}
+
+message chat_quote {
+  chat_header original = 1;
+}
+
+message chat_location {
+  optional string description = 1;
+  double lat = 2;
+  double lon = 3;
+}
+
+message chat_deleted {
+
+}
